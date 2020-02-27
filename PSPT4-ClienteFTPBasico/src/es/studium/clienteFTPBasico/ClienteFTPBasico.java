@@ -250,7 +250,7 @@ public class ClienteFTPBasico extends JFrame {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
+				if (e.getClickCount() >= 2) {
 					archivoSeleccionado = listaDirec.getSelectedValue().toString();
 					if (archivoSeleccionado.startsWith("(DIR)")) {
 						try {
