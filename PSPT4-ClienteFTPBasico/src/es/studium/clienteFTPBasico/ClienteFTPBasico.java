@@ -497,8 +497,7 @@ public class ClienteFTPBasico extends JFrame {
 									+ "\"");
 					try {
 						if (!nombreNuevoFichero.trim().equals("")) {
-							String[] partesFic = archivoSeleccionado.split(".");
-							System.out.println(partesFic[1]);
+							String[] partesFic = archivoSeleccionado.split("\\.");
 							cliente.rename(archivoSeleccionado, (nombreNuevoFichero+"."+partesFic[partesFic.length-1]));
 							String m = archivoSeleccionado.trim() + " => Se ha modificado correctamente a ..."+nombreNuevoFichero;
 							JOptionPane.showMessageDialog(null, m);
