@@ -106,7 +106,7 @@ public class ClienteFTPBasico extends JFrame {
 		txtUsuario.setBounds(500, 410, 128, 20);
 		txtUsuario.setText("Usuario: " + user);
 		txtDirectorioRaiz.setBounds(500, 379, 137, 20);
-		txtDirectorioRaiz.setText("DIRECTORIO RAIZ: " + directorioInicial);
+		txtDirectorioRaiz.setText("DIRECTORIO RAÍZ: " + directorioInicial);
 		getContentPane().setLayout(null);
 		// Preparación de la lista
 		// se configura el tipo de selección para que solo se pueda
@@ -197,8 +197,8 @@ public class ClienteFTPBasico extends JFrame {
 		setVisible(true);
 
 		/*
-		 * ################################################### 
-		 * # Acciones al pulsar en la lista o en los botones #
+		 * ################################################### # Acciones al pulsar en
+		 * la lista o en los botones #
 		 * ###################################################
 		 */
 
@@ -208,16 +208,23 @@ public class ClienteFTPBasico extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent lse) {
 				if (lse.getValueIsAdjusting()) {
-					archivoSeleccionado = listaDirec.getSelectedValue().toString();
-					if (archivoSeleccionado.startsWith("(DIR)")) {
-						carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
-						txtArbolDirectoriosConstruido.setText("CARPETA SELECCIONADA: " + carpetaSeleccionada);	
-					} else if (archivoSeleccionado.equals("···")) {
-						txtArbolDirectoriosConstruido.setText("SELECCIONADO EL DIRECTORIO PADRE");
-					} else {
-						txtArbolDirectoriosConstruido.setText("FICHERO SELECCIONADO: " + archivoSeleccionado);
+					try {
+						archivoSeleccionado = listaDirec.getSelectedValue().toString();
+						if (archivoSeleccionado.startsWith("(DIR)")) {
+							carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
+							txtArbolDirectoriosConstruido.setText("CARPETA SELECCIONADA: " + carpetaSeleccionada);
+						} else if (archivoSeleccionado.equals("···")) {
+							txtArbolDirectoriosConstruido.setText("SELECCIONADO EL DIRECTORIO PADRE");
+						} else {
+							txtArbolDirectoriosConstruido.setText("FICHERO SELECCIONADO: " + archivoSeleccionado);
+						}
+						txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
+						archivoSeleccionado = "";
+						carpetaSeleccionada = "";
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Ha habido un error. Vuelva a intentarlo", "ERROR",
+								JOptionPane.ERROR_MESSAGE);
 					}
-					txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
 				}
 			}
 		});
@@ -251,64 +258,82 @@ public class ClienteFTPBasico extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					archivoSeleccionado = listaDirec.getSelectedValue().toString();
-					if (archivoSeleccionado.startsWith("(DIR)")) {
-						try {
-							carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
-							if (directorioActual.equals(directorioInicial)) {
-								directorioActual = directorioActual + carpetaSeleccionada;
-								System.out.println(directorioActual);
-							} else {
-								directorioActual = directorioActual + "/" + carpetaSeleccionada;
-								System.out.println(directorioActual);
-							}
-							// Se establece el directorio de trabajo actual
-							cliente.changeWorkingDirectory(directorioActual);
-							// Obteniendo ficheros y directorios del directorio actual
-							FTPFile[] files = cliente.listFiles();
-							llenarLista(files);
-							txtArbolDirectoriosConstruido.setText("SE HA ACCEDIDO A UN NUEVO DIRECTORIO");
-							txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
-							carpetaSeleccionada = "";
-							archivoSeleccionado="";
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-					if (archivoSeleccionado.equals("···")) {
-						try {
-							String[] partes = directorioActual.split("/");
-							if (partes.length == 2) {
-								directorioActual = directorioActual.substring(0,
-										((directorioActual.length()) - (partes[partes.length - 1]).length()));
-							} else {
-								directorioActual = directorioActual.substring(0,
-										((directorioActual.length()) - (partes[partes.length - 1]).length() - 1));
-							}
-							System.out.println(directorioActual);
-							// Se establece el directorio de trabajo actual
-							cliente.changeWorkingDirectory(directorioActual);
-							// Obteniendo ficheros y directorios del directorio actual
-							FTPFile[] files = cliente.listFiles();
-							llenarLista(files);
-							txtArbolDirectoriosConstruido.setText("SE HA ACCEDIDO AL DIRECTORIO PADRE");
-							txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
-							carpetaSeleccionada = "";
-							archivoSeleccionado="";
-						} catch (Exception e2) {
-							if (directorioActual.equals(directorioInicial)) {
-								JOptionPane.showMessageDialog(null,
-										"No se ha podido acceder al directorio padre. Ya se encuentra en el directorio raiz.",
-										"ERROR", JOptionPane.ERROR_MESSAGE);
-							} else {
-								JOptionPane.showMessageDialog(null, "No se ha podido acceder al directorio padre.",
-										"ERROR", JOptionPane.ERROR_MESSAGE);
+					try {
+						archivoSeleccionado = listaDirec.getSelectedValue().toString();
+						if (archivoSeleccionado.startsWith("(DIR)")) {
+							try {
+								carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
+								if (directorioActual.equals(directorioInicial)) {
+									directorioActual = directorioActual + carpetaSeleccionada;
+									System.out.println(directorioActual);
+								} else {
+									directorioActual = directorioActual + "/" + carpetaSeleccionada;
+									System.out.println(directorioActual);
+								}
+								// Se establece el directorio de trabajo actual
+								cliente.changeWorkingDirectory(directorioActual);
+								// Obteniendo ficheros y directorios del directorio actual
+								FTPFile[] files = cliente.listFiles();
+								llenarLista(files);
+								txtArbolDirectoriosConstruido.setText("SE HA ACCEDIDO A UN NUEVO DIRECTORIO");
+								txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
+								carpetaSeleccionada = "";
+								archivoSeleccionado = "";
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								String[] partes = directorioActual.split("/");
+								if (partes.length == 2) {
+									directorioActual = directorioActual.substring(0,
+											((directorioActual.length()) - (partes[partes.length - 1]).length()));
+								} else {
+									directorioActual = directorioActual.substring(0,
+											((directorioActual.length()) - (partes[partes.length - 1]).length() - 1));
+								}
+								JOptionPane.showMessageDialog(null, "No se ha podido acceder al directorio.", "ERROR",
+										JOptionPane.ERROR_MESSAGE);
+								archivoSeleccionado = "";
+								carpetaSeleccionada = "";
 							}
 						}
+						if (archivoSeleccionado.equals("···")) {
+							try {
+								String[] partes = directorioActual.split("/");
+								if (partes.length == 2) {
+									directorioActual = directorioActual.substring(0,
+											((directorioActual.length()) - (partes[partes.length - 1]).length()));
+								} else {
+									directorioActual = directorioActual.substring(0,
+											((directorioActual.length()) - (partes[partes.length - 1]).length() - 1));
+								}
+								System.out.println(directorioActual);
+								// Se establece el directorio de trabajo actual
+								cliente.changeWorkingDirectory(directorioActual);
+								// Obteniendo ficheros y directorios del directorio actual
+								FTPFile[] files = cliente.listFiles();
+								llenarLista(files);
+								txtArbolDirectoriosConstruido.setText("SE HA ACCEDIDO AL DIRECTORIO PADRE");
+								txtActualizarArbol.setText("DIRECTORIO ACTUAL: " + directorioActual);
+								carpetaSeleccionada = "";
+								archivoSeleccionado = "";
+							} catch (Exception e2) {
+								if (directorioActual.equals(directorioInicial)) {
+									JOptionPane.showMessageDialog(null,
+											"No se ha podido acceder al directorio padre. Ya se encuentra en el directorio raíz.",
+											"ERROR", JOptionPane.ERROR_MESSAGE);
+								} else {
+									JOptionPane.showMessageDialog(null, "No se ha podido acceder al directorio padre.",
+											"ERROR", JOptionPane.ERROR_MESSAGE);
+								}
+								archivoSeleccionado = "";
+								carpetaSeleccionada = "";
+							}
+						}
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Ha habido un error. Vuelva a intentarlo", "ERROR",
+								JOptionPane.ERROR_MESSAGE);
 					}
-				}
 
+				}
 			}
 		});
 
@@ -317,33 +342,40 @@ public class ClienteFTPBasico extends JFrame {
 		btnCreaCarpeta.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String nombreCarpeta = JOptionPane.showInputDialog(null, "Introduce el nombre del directorio",
-						"carpeta");
-				if (!(nombreCarpeta == null)) {
-					String directorio = directorioActual;
-					if (!directorioActual.equals("/"))
-						directorio = directorio + "/";
-					// nombre del directorio a crear
-					directorio += nombreCarpeta.trim();
-					// quita blancos a derecha y a izquierda
-					try {
-						if (cliente.makeDirectory(directorio)) {
-							String m = nombreCarpeta.trim() + " => Se ha creado correctamente ...";
-							JOptionPane.showMessageDialog(null, m);
-							txtArbolDirectoriosConstruido.setText(m);
-							// directorio de trabajo actual
-							cliente.changeWorkingDirectory(directorioActual);
-							FTPFile[] ff2 = null;
-							// obtener ficheros del directorio actual
-							ff2 = cliente.listFiles();
-							// llenar la lista
-							llenarLista(ff2);
-						} else
+				try {
+					String nombreCarpeta = JOptionPane.showInputDialog(null, "Introduce el nombre del directorio",
+							"carpeta");
+					if (!(nombreCarpeta == null)) {
+						String directorio = directorioActual;
+						if (!directorioActual.equals("/"))
+							directorio = directorio + "/";
+						// nombre del directorio a crear
+						directorio += nombreCarpeta.trim();
+						// quita blancos a derecha y a izquierda
+						try {
+							if (cliente.makeDirectory(directorio)) {
+								String m = nombreCarpeta.trim() + " => Se ha creado correctamente ...";
+								JOptionPane.showMessageDialog(null, m);
+								txtArbolDirectoriosConstruido.setText(m);
+								// directorio de trabajo actual
+								cliente.changeWorkingDirectory(directorioActual);
+								FTPFile[] ff2 = null;
+								// obtener ficheros del directorio actual
+								ff2 = cliente.listFiles();
+								// llenar la lista
+								llenarLista(ff2);
+							} else {
+								JOptionPane.showMessageDialog(null,
+										nombreCarpeta.trim() + " => No se ha podido crear ...");
+							}
+						} catch (IOException e1) {
 							JOptionPane.showMessageDialog(null, nombreCarpeta.trim() + " => No se ha podido crear ...");
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				} // final del if
+						}
+					} // final del if
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Ha habido un error. Vuelva a intentarlo", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		}); // final del botón CreaDir
 
@@ -351,46 +383,52 @@ public class ClienteFTPBasico extends JFrame {
 		btnEliminarCarpeta.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				try {
+					archivoSeleccionado = listaDirec.getSelectedValue().toString();
+					if (archivoSeleccionado.startsWith("(DIR)")) {
+						carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
+						int seleccion = JOptionPane.showConfirmDialog(null,
+								"¿Desea eliminar la carpeta  \"" + carpetaSeleccionada + "\"?");
+						if (seleccion == JOptionPane.OK_OPTION) {
+							String directorio = directorioActual;
+							if (!directorioActual.equals("/"))
+								directorio = directorio + "/";
+							// nombre del directorio a eliminar
+							directorio += carpetaSeleccionada.trim(); // quita blancos a derecha y a izquierda
+							try {
+								if (cliente.removeDirectory(directorio)) {
+									String m = carpetaSeleccionada.trim() + " => Se ha eliminado correctamente ...";
+									JOptionPane.showMessageDialog(null, m);
+									txtArbolDirectoriosConstruido.setText(m);
+									// directorio de trabajo actual
+									cliente.changeWorkingDirectory(directorioActual);
+									FTPFile[] ff2 = null;
+									// obtener ficheros del directorio actual
+									ff2 = cliente.listFiles();
+									// llenar la lista
+									llenarLista(ff2);
+								} else {
+									JOptionPane.showMessageDialog(null,
+											carpetaSeleccionada.trim() + " => No se ha podido eliminar ...");
+								}
+								archivoSeleccionado = "";
+								carpetaSeleccionada = "";
 
-				String nombreCarpeta;
-
-				if (carpetaSeleccionada.equals("")) {
-					nombreCarpeta = JOptionPane.showInputDialog(null, "Introduce el nombre del directorio a eliminar",
-							"carpeta");
-				} else if (archivoSeleccionado.startsWith("(DIR)")) {
-					nombreCarpeta = JOptionPane.showInputDialog(null, "Introduce el nombre del directorio a eliminar",
-							carpetaSeleccionada);
-				} else {
-					nombreCarpeta = JOptionPane.showInputDialog(null, "Introduce el nombre del directorio a eliminar",
-							"carpeta");
-				}
-
-				if (!(nombreCarpeta == null)) {
-					String directorio = directorioActual;
-					if (!directorioActual.equals("/"))
-						directorio = directorio + "/";
-					// nombre del directorio a eliminar
-					directorio += nombreCarpeta.trim(); // quita blancos a derecha y a izquierda
-					try {
-						if (cliente.removeDirectory(directorio)) {
-							String m = nombreCarpeta.trim() + " => Se ha eliminado correctamente ...";
-							JOptionPane.showMessageDialog(null, m);
-							txtArbolDirectoriosConstruido.setText(m);
-							// directorio de trabajo actual
-							cliente.changeWorkingDirectory(directorioActual);
-							FTPFile[] ff2 = null;
-							// obtener ficheros del directorio actual
-							ff2 = cliente.listFiles();
-							// llenar la lista
-							llenarLista(ff2);
-						} else
-							JOptionPane.showMessageDialog(null,
-									nombreCarpeta.trim() + " => No se ha podido eliminar ...");
-					} catch (IOException e1) {
-						e1.printStackTrace();
+							} catch (IOException e1) {
+								archivoSeleccionado = "";
+								carpetaSeleccionada = "";
+								JOptionPane.showMessageDialog(null,
+										carpetaSeleccionada.trim() + " => No se ha podido eliminar ...");
+							}
+						}
+					} else {
+						archivoSeleccionado = "";
+						carpetaSeleccionada = "";
+						JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta para eliminar ...");
 					}
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta para modificar ...");
 				}
-				// final del if
 			}
 		});
 		// RENOMBRAR CARPETA
@@ -398,14 +436,19 @@ public class ClienteFTPBasico extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!carpetaSeleccionada.equals("")) {
-					String nombreNuevoCarpeta = JOptionPane.showInputDialog(null,
-							"Introduce el nombre nuevo que quieres ponerle a la carpeta \"" + carpetaSeleccionada
-									+ "\"");
-					try {
+				String nombreNuevoCarpeta = "";
+				try {
+					archivoSeleccionado = listaDirec.getSelectedValue().toString();
+					carpetaSeleccionada = archivoSeleccionado.substring(6, archivoSeleccionado.length());
+					if (archivoSeleccionado.startsWith("(DIR)")) {
+						nombreNuevoCarpeta = JOptionPane.showInputDialog(null,
+								"Introduce el nombre nuevo que quieres ponerle a la carpeta \"" + carpetaSeleccionada
+										+ "\"");
+
 						if (!nombreNuevoCarpeta.trim().equals("")) {
 							cliente.rename(carpetaSeleccionada, nombreNuevoCarpeta);
-							String m = carpetaSeleccionada.trim() + " => Se ha modificado correctamente a ..."+nombreNuevoCarpeta;
+							String m = carpetaSeleccionada.trim() + " => Se ha modificado correctamente a ..."
+									+ nombreNuevoCarpeta;
 							JOptionPane.showMessageDialog(null, m);
 							txtArbolDirectoriosConstruido.setText(m);
 							// directorio de trabajo actual
@@ -419,87 +462,126 @@ public class ClienteFTPBasico extends JFrame {
 							JOptionPane.showMessageDialog(null,
 									nombreNuevoCarpeta.trim() + " => No se ha podido modificar ...");
 						}
+						archivoSeleccionado = "";
+						carpetaSeleccionada = "";
 
-					} catch (IOException e1) {
-						e1.printStackTrace();
+					} else {
+						JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta para modificar ...");
 					}
-				}else {
-					JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta para modificar ...");
+				} catch (Exception e1) {
+					nombreNuevoCarpeta="";
+					if (nombreNuevoCarpeta.equals("") & !archivoSeleccionado.equals("")) {
+						JOptionPane.showMessageDialog(null, "Modificación de carpeta cancelada ...");
+					} else {
+						JOptionPane.showMessageDialog(null, "No se ha seleccionado ninguna carpeta para modificar ...");
+					}
+					archivoSeleccionado = "";
+					carpetaSeleccionada = "";
 				}
 			}
 		});
-		
+
 		/* FICHEROS */
 		// SUBIR FICHERO
 		btnSubirFichero.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser f;
-				File file;
-				f = new JFileChooser();
-				// solo se pueden seleccionar ficheros
-				f.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				// título de la ventana
-				f.setDialogTitle("Selecciona el fichero a subir al servidor FTP");
-				// se muestra la ventana
-				int returnVal = f.showDialog(f, "Cargar");
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					// fichero seleccionado
-					file = f.getSelectedFile();
-					// nombre completo del fichero
-					String archivo = file.getAbsolutePath();
-					// solo nombre del fichero
-					String nombreArchivo = file.getName();
-					try {
-						SubirFichero(archivo, nombreArchivo);
-					} catch (IOException e1) {
-						e1.printStackTrace();
+				try {
+					JFileChooser f;
+					File file;
+					f = new JFileChooser();
+					// solo se pueden seleccionar ficheros
+					f.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					// título de la ventana
+					f.setDialogTitle("Selecciona el fichero a subir al servidor FTP");
+					// se muestra la ventana
+					int returnVal = f.showDialog(f, "Cargar");
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						// fichero seleccionado
+						file = f.getSelectedFile();
+						// nombre completo del fichero
+						String archivo = file.getAbsolutePath();
+						// solo nombre del fichero
+						String nombreArchivo = file.getName();
+						try {
+							SubirFichero(archivo, nombreArchivo);
+						} catch (IOException e1) {
+							JOptionPane.showMessageDialog(null, "No se ha podido subir el fichero ...");
+						}
 					}
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Ha habido un error. Vuelva a intentarlo", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}); // Fin botón subir
-		
+
 		// DESCARGAR FICHERO
 		botonDescargarFichero.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String directorio = directorioActual;
-				if (!directorioActual.equals("/"))
-					directorio = directorio + "/";
-				if (!directorioActual.equals("")) {
-					DescargarFichero(directorio + archivoSeleccionado, archivoSeleccionado);
+				try {
+					archivoSeleccionado = listaDirec.getSelectedValue().toString();
+					if (!archivoSeleccionado.startsWith("(DIR)") & !archivoSeleccionado.equals("···")) {
+						String directorio = directorioActual;
+						if (!directorioActual.equals("/"))
+							directorio = directorio + "/";
+						if (!directorioActual.equals("")) {
+							DescargarFichero(directorio + archivoSeleccionado, archivoSeleccionado);
+						}
+					} else {
+						JOptionPane.showMessageDialog(null, "No ha seleccionado ningún fichero. Vuelva a intentarlo",
+								"ERROR", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "No ha seleccionado ningún fichero. Vuelva a intentarlo",
+							"ERROR", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}); // Fin botón descargar
-		
+
 		// ELIMINAR FICHERO
 		botonEliminarFichero.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String directorio = directorioActual;
-				if (!directorioActual.equals("/"))
-					directorio = directorio + "/";
-				if (!directorioActual.equals("")) {
-					BorrarFichero(directorio + archivoSeleccionado, archivoSeleccionado);
+				try {
+					String directorio = directorioActual;
+					archivoSeleccionado = listaDirec.getSelectedValue().toString();
+					if (!archivoSeleccionado.startsWith("(DIR)") & !archivoSeleccionado.equals("···")) {
+						if (!directorioActual.equals("/"))
+							directorio = directorio + "/";
+						if (!directorioActual.equals("")) {
+							BorrarFichero(directorio + archivoSeleccionado, archivoSeleccionado);
+						}
+					} else {
+						JOptionPane.showMessageDialog(null, "No ha seleccionado ningún fichero. Vuelva a intentarlo",
+								"ERROR", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Ha habido un error. Vuelva a intentarlo", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
-		
+
 		// RENOMBRAR FICHERO
 		btnRenombrarFichero.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				archivoSeleccionado = listaDirec.getSelectedValue().toString();
-				if (!archivoSeleccionado.startsWith("(DIR)") & !archivoSeleccionado.isEmpty()) {
-					String nombreNuevoFichero = JOptionPane.showInputDialog(null,
-							"Introduce el nombre nuevo que quieres ponerle al fichero \"" + archivoSeleccionado
-									+ "\"");
-					try {
+				try {
+					archivoSeleccionado = listaDirec.getSelectedValue().toString();
+					if (!archivoSeleccionado.startsWith("(DIR)") & !archivoSeleccionado.equals("···")) {
+						String nombreNuevoFichero = JOptionPane.showInputDialog(null,
+								"Introduce el nombre nuevo que quieres ponerle al fichero \"" + archivoSeleccionado
+										+ "\"");
+
 						if (!nombreNuevoFichero.trim().equals("")) {
 							String[] partesFic = archivoSeleccionado.split("\\.");
-							cliente.rename(archivoSeleccionado, (nombreNuevoFichero+"."+partesFic[partesFic.length-1]));
-							String m = archivoSeleccionado.trim() + " => Se ha modificado correctamente a ..."+nombreNuevoFichero;
+							cliente.rename(archivoSeleccionado,
+									(nombreNuevoFichero + "." + partesFic[partesFic.length - 1]));
+							String m = archivoSeleccionado.trim() + " => Se ha modificado correctamente a ..."
+									+ nombreNuevoFichero;
 							JOptionPane.showMessageDialog(null, m);
 							txtArbolDirectoriosConstruido.setText(m);
 							// directorio de trabajo actual
@@ -514,15 +596,15 @@ public class ClienteFTPBasico extends JFrame {
 									nombreNuevoFichero.trim() + " => No se ha podido modificar ...");
 						}
 
-					} catch (IOException e1) {
-						e1.printStackTrace();
+					} else {
+						JOptionPane.showMessageDialog(null, "No se ha seleccionado ningún fichero para modificar ...");
 					}
-				}else {
+				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(null, "No se ha seleccionado ningún fichero para modificar ...");
 				}
 			}
 		});
-		
+
 		/* SALIR */
 		botonSalir.addActionListener(new ActionListener() {
 
@@ -531,15 +613,12 @@ public class ClienteFTPBasico extends JFrame {
 				try {
 					cliente.disconnect();
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					JOptionPane.showMessageDialog(null, "No se ha podido desconectar el cliente correctamente");
 				}
 				System.exit(0);
 			}
 		});
 
-		
-		
-		
 	} // fin constructor
 
 	private static void llenarLista(FTPFile[] files) {
@@ -573,7 +652,7 @@ public class ClienteFTPBasico extends JFrame {
 			// se asigna el listmodel al JList,
 			// se muestra en pantalla la lista de ficheros y direc
 			listaDirec.setModel(modeloLista);
-		} catch (NullPointerException n) {
+		} catch (Exception n) {
 			; // Se produce al cambiar de directorio
 		}
 	}// Fin llenarLista
@@ -625,14 +704,14 @@ public class ClienteFTPBasico extends JFrame {
 					JOptionPane.showMessageDialog(null, nombreFichero + " => No se ha podido descargar ...");
 				out.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, nombreFichero + " => No se ha podido descargar ...");
 			}
 		}
 	} // Final de DescargarFichero
 
 	private void BorrarFichero(String NombreCompleto, String nombreFichero) {
 		// pide confirmación
-		int seleccion = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el fichero seleccionado?");
+		int seleccion = JOptionPane.showConfirmDialog(null, "¿Desea eliminar el fichero  \"" + nombreFichero + "\"?");
 		if (seleccion == JOptionPane.OK_OPTION) {
 			try {
 				if (cliente.deleteFile(NombreCompleto)) {
@@ -649,7 +728,7 @@ public class ClienteFTPBasico extends JFrame {
 				} else
 					JOptionPane.showMessageDialog(null, nombreFichero + " => No se ha podido eliminar ...");
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				JOptionPane.showMessageDialog(null, nombreFichero + " => No se ha podido eliminar ...");
 			}
 		}
 	}// Final de BorrarFichero
